@@ -1,0 +1,536 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Smart Canteen | Menu</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+
+    <style>
+        * { box-sizing: border-box; }
+
+        body {
+            margin: 0;
+            background: #fff8f2;
+            color: #26352e;
+            font-family: Arial, sans-serif;
+        }
+
+        .menu-header {
+            text-align: center;
+            padding: 38px 16px 20px;
+        }
+
+        .menu-header h1 {
+            margin: 0 0 10px;
+            font-size: clamp(30px, 5vw, 42px);
+            color: #174d38;
+        }
+
+        .menu-header p {
+            color: #737b75;
+            font-size: 16px;
+        }
+
+        .search-box {
+            width: 90%;
+            max-width: 600px;
+            margin: 20px auto;
+        }
+
+        .search-box input {
+            width: 100%;
+            padding: 15px 20px;
+            border: 1px solid #e5e8e3;
+            border-radius: 14px;
+            font-size: 16px;
+            outline: none;
+            background: white;
+        }
+
+        .search-box input:focus {
+            border-color: #147653;
+        }
+
+        .categories {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 10px;
+            margin: 22px 12px 30px;
+        }
+
+        .category {
+            border: 1px solid #e2e8e2;
+            background: white;
+            padding: 11px 20px;
+            border-radius: 25px;
+            cursor: pointer;
+            font-weight: 600;
+        }
+
+        .category.active,
+        .category:hover {
+            background: #087653;
+            color: white;
+        }
+
+        .food-section {
+            width: 92%;
+            max-width: 1300px;
+            margin: auto;
+            padding-bottom: 100px;
+        }
+
+        .food-section h2 {
+            margin-bottom: 22px;
+            font-size: 26px;
+        }
+
+        .food-grid {
+            display: grid;
+            grid-template-columns: repeat(3, minmax(0, 1fr));
+            gap: 24px;
+        }
+
+        .food-card {
+            overflow: hidden;
+            background: white;
+            border: 1px solid #ecece6;
+            border-radius: 18px;
+            box-shadow: 0 5px 18px #25382a12;
+            transition: transform .2s, box-shadow .2s;
+        }
+
+        .food-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 10px 25px #25382a1c;
+        }
+
+        .food-image {
+            height: 210px;
+            overflow: hidden;
+            background: #eee9df;
+        }
+
+        .food-image img {
+            display: block;
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: transform .3s;
+        }
+
+        .food-card:hover .food-image img {
+            transform: scale(1.04);
+        }
+
+        .food-details {
+            padding: 18px;
+        }
+
+        .food-details h3 {
+            margin: 0 0 8px;
+            font-size: 21px;
+        }
+
+        .food-details p {
+            color: #727b74;
+            font-size: 14px;
+            line-height: 1.5;
+            min-height: 42px;
+        }
+
+        .food-bottom {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        .price {
+            font-size: 22px;
+            font-weight: 700;
+            color: #087653;
+        }
+
+        .quantity-control {
+            display: flex;
+            align-items: center;
+            gap: 0;
+            border: 1px solid #dce4dd;
+            border-radius: 10px;
+            overflow: hidden;
+            height: 38px;
+        }
+
+        .quantity-control button {
+            width: 34px;
+            height: 38px;
+            border: none;
+            background: #f0f7f2;
+            color: #075b3c;
+            font-size: 20px;
+            cursor: pointer;
+        }
+
+        .quantity-control button:hover {
+            background: #dcefe2;
+        }
+
+        .quantity-control span {
+            min-width: 30px;
+            text-align: center;
+            font-weight: 700;
+        }
+
+        .add-btn {
+            width: 100%;
+            margin-top: 14px;
+            padding: 12px;
+            border: none;
+            border-radius: 10px;
+            background: #087653;
+            color: white;
+            font-size: 15px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: background .2s;
+        }
+
+        .add-btn:hover {
+            background: #065b40;
+        }
+
+        .no-results {
+            display: none;
+            text-align: center;
+            padding: 35px;
+            background: white;
+            border-radius: 16px;
+        }
+
+        .cart-button {
+            position: fixed;
+            right: 22px;
+            bottom: 22px;
+            z-index: 10;
+            padding: 15px 23px;
+            border-radius: 30px;
+            background: #087653;
+            color: white;
+            text-decoration: none;
+            font-weight: 700;
+            box-shadow: 0 6px 20px #0002;
+        }
+
+        @media (max-width: 900px) {
+            .food-grid {
+                grid-template-columns: repeat(2, minmax(0, 1fr));
+            }
+        }
+
+        @media (max-width: 560px) {
+            .food-grid { grid-template-columns: 1fr; }
+            .food-image { height: 230px; }
+            .food-details { padding: 16px; }
+            .food-section { width: 92%; }
+        }
+    </style>
+</head>
+
+<body>
+
+<nav class="navbar">
+    <div class="logo">🍔 Smart Canteen</div>
+    <div class="nav-links">
+        <a href="/">Home</a>
+        <a href="/menu">Menu</a>
+        <a href="/login">Login</a>
+        <a href="/my-orders">My Orders</a>
+    </div>
+</nav>
+
+<header class="menu-header">
+    <h1>Today's Menu 🍽️</h1>
+    <p>Fresh food • Affordable prices • Less waiting</p>
+</header>
+
+<div class="search-box">
+    <input
+        type="search"
+        id="foodSearch"
+        placeholder="🔍 Search your favourite food..."
+        autocomplete="off">
+</div>
+
+<div class="categories">
+    <button class="category active" data-category="all">All</button>
+    <button class="category" data-category="breakfast">Breakfast</button>
+    <button class="category" data-category="main">Main Food</button>
+    <button class="category" data-category="snacks">Snacks</button>
+    <button class="category" data-category="drinks">Drinks</button>
+</div>
+
+<main class="food-section">
+    <h2>Our Delicious Menu 😋</h2>
+
+    <div class="food-grid" id="foodGrid">
+
+        <!-- 1. PAV BHAJI -->
+        <article class="food-card" data-name="pav bhaji" data-category="main">
+            <div class="food-image">
+                <img src="https://images.unsplash.com/photo-1753357303396-704b5abe8945?auto=format&fit=crop&w=900&q=85"
+                     alt="Pav Bhaji" loading="lazy">
+            </div>
+            <div class="food-details">
+                <h3>Pav Bhaji</h3>
+                <p>Spicy buttery bhaji served with soft pav.</p>
+                <div class="food-bottom">
+                    <span class="price">₹50</span>
+                    <div class="quantity-control">
+                        <button type="button" onclick="changeQty(this,-1)">−</button>
+                        <span class="qty">1</span>
+                        <button type="button" onclick="changeQty(this,1)">+</button>
+                    </div>
+                </div>
+                <button class="add-btn" onclick="addToCart(this,'Pav Bhaji')">🛒 Add to Cart</button>
+            </div>
+        </article>
+
+        <!-- 2. POHA -->
+        <article class="food-card" data-name="poha" data-category="breakfast">
+            <div class="food-image">
+                <img src="https://cdn.pixabay.com/photo/2022/05/07/16/38/poha-7180676_1280.jpg"
+                     alt="Poha" loading="lazy">
+            </div>
+            <div class="food-details">
+                <h3>Poha</h3>
+                <p>Light Indian breakfast with peanuts and lemon.</p>
+                <div class="food-bottom">
+                    <span class="price">₹25</span>
+                    <div class="quantity-control">
+                        <button type="button" onclick="changeQty(this,-1)">−</button>
+                        <span class="qty">1</span>
+                        <button type="button" onclick="changeQty(this,1)">+</button>
+                    </div>
+                </div>
+                <button class="add-btn" onclick="addToCart(this,'Poha')">🛒 Add to Cart</button>
+            </div>
+        </article>
+
+        <!-- 3. MAGGI -->
+        <article class="food-card" data-name="maggi noodles" data-category="snacks">
+            <div class="food-image">
+                <img src="https://images.unsplash.com/photo-1692273212247-f5efb3fc9b87?auto=format&fit=crop&w=900&q=85"
+                     alt="Maggi noodles" loading="lazy">
+            </div>
+            <div class="food-details">
+                <h3>Maggi</h3>
+                <p>Hot and tasty masala noodles for your break.</p>
+                <div class="food-bottom">
+                    <span class="price">₹35</span>
+                    <div class="quantity-control">
+                        <button type="button" onclick="changeQty(this,-1)">−</button>
+                        <span class="qty">1</span>
+                        <button type="button" onclick="changeQty(this,1)">+</button>
+                    </div>
+                </div>
+                <button class="add-btn" onclick="addToCart(this,'Maggi')">🛒 Add to Cart</button>
+            </div>
+        </article>
+
+        <!-- 4. SANDWICH -->
+        <article class="food-card" data-name="sandwich grilled sandwich" data-category="snacks">
+            <div class="food-image">
+                <img src="https://images.unsplash.com/photo-1528735602780-2552fd46c7af?auto=format&fit=crop&w=900&q=85"
+                     alt="Grilled sandwich" loading="lazy">
+            </div>
+            <div class="food-details">
+                <h3>Sandwich</h3>
+                <p>Grilled sandwich filled with fresh vegetables.</p>
+                <div class="food-bottom">
+                    <span class="price">₹40</span>
+                    <div class="quantity-control">
+                        <button type="button" onclick="changeQty(this,-1)">−</button>
+                        <span class="qty">1</span>
+                        <button type="button" onclick="changeQty(this,1)">+</button>
+                    </div>
+                </div>
+                <button class="add-btn" onclick="addToCart(this,'Sandwich')">🛒 Add to Cart</button>
+            </div>
+        </article>
+
+        <!-- 5. TEA -->
+        <article class="food-card" data-name="tea chai" data-category="drinks">
+            <div class="food-image">
+                <img src="https://images.unsplash.com/photo-1544787219-7f47ccb76574?auto=format&fit=crop&w=900&q=85"
+                     alt="Tea" loading="lazy">
+            </div>
+            <div class="food-details">
+                <h3>Tea</h3>
+                <p>Hot, refreshing chai for your college break.</p>
+                <div class="food-bottom">
+                    <span class="price">₹15</span>
+                    <div class="quantity-control">
+                        <button type="button" onclick="changeQty(this,-1)">−</button>
+                        <span class="qty">1</span>
+                        <button type="button" onclick="changeQty(this,1)">+</button>
+                    </div>
+                </div>
+                <button class="add-btn" onclick="addToCart(this,'Tea')">🛒 Add to Cart</button>
+            </div>
+        </article>
+
+        <!-- 6. COLD COFFEE -->
+        <article class="food-card" data-name="cold coffee" data-category="drinks">
+            <div class="food-image">
+                <img src="https://images.unsplash.com/photo-1752216581594-a235ddcbfa9f?auto=format&fit=crop&w=900&q=85"
+                     alt="Cold coffee" loading="lazy"
+                     onerror="this.onerror=null;this.src='https://images.unsplash.com/photo-1461023058943-07fcbe16d735?auto=format&fit=crop&w=900&q=85';">
+            </div>
+            <div class="food-details">
+                <h3>Cold Coffee</h3>
+                <p>Chilled, creamy coffee to refresh your day.</p>
+                <div class="food-bottom">
+                    <span class="price">₹40</span>
+                    <div class="quantity-control">
+                        <button type="button" onclick="changeQty(this,-1)">−</button>
+                        <span class="qty">1</span>
+                        <button type="button" onclick="changeQty(this,1)">+</button>
+                    </div>
+                </div>
+                <button class="add-btn" onclick="addToCart(this,'Cold Coffee')">🛒 Add to Cart</button>
+            </div>
+        </article>
+        
+
+
+        <!-- 8. VEG PULAV -->
+        <article class="food-card" data-name="veg pulav vegetable pulao" data-category="main">
+            <div class="food-image">
+                <img src="https://images.unsplash.com/photo-1512058564366-18510be2db19?auto=format&fit=crop&w=900&q=85"
+                     alt="Vegetable pulao" loading="lazy">
+            </div>
+            <div class="food-details">
+                <h3>Veg Pulav</h3>
+                <p>Fragrant rice cooked with vegetables and spices.</p>
+                <div class="food-bottom">
+                    <span class="price">₹50</span>
+                    <div class="quantity-control">
+                        <button type="button" onclick="changeQty(this,-1)">−</button>
+                        <span class="qty">1</span>
+                        <button type="button" onclick="changeQty(this,1)">+</button>
+                    </div>
+                </div>
+                <button class="add-btn" onclick="addToCart(this,'Veg Pulav')">🛒 Add to Cart</button>
+            </div>
+        </article>
+
+        <!-- 9. SAMOSA -->
+        <article class="food-card" data-name="samosa" data-category="snacks">
+            <div class="food-image">
+                <img src="https://images.unsplash.com/photo-1601050690597-df0568f70950?auto=format&fit=crop&w=900&q=85"
+                     alt="Samosa" loading="lazy">
+            </div>
+            <div class="food-details">
+                <h3>Samosa</h3>
+                <p>Crispy golden pastry with a spiced potato filling.</p>
+                <div class="food-bottom">
+                    <span class="price">₹15</span>
+                    <div class="quantity-control">
+                        <button type="button" onclick="changeQty(this,-1)">−</button>
+                        <span class="qty">1</span>
+                        <button type="button" onclick="changeQty(this,1)">+</button>
+                    </div>
+                </div>
+                <button class="add-btn" onclick="addToCart(this,'Samosa')">🛒 Add to Cart</button>
+            </div>
+        </article>
+
+    </div>
+
+    <div class="no-results" id="noResults">
+        <h3>😕 No food found</h3>
+        <p>Try searching for another food item.</p>
+    </div>
+</main>
+
+<a href="/cart" class="cart-button">🛒 View Cart</a>
+
+<script>
+    // Quantity buttons: minimum 1, maximum 20
+    function changeQty(button, change) {
+        const quantityElement = button.parentElement.querySelector(".qty");
+        let quantity = parseInt(quantityElement.textContent, 10);
+        quantity += change;
+
+        if (quantity < 1) quantity = 1;
+        if (quantity > 20) quantity = 20;
+
+        quantityElement.textContent = quantity;
+    }
+
+    // Send selected item and quantity to Flask
+    function addToCart(button, itemName) {
+        const card = button.closest(".food-card");
+        const quantity = parseInt(
+            card.querySelector(".qty").textContent,
+            10
+        );
+
+        window.location.href =
+            "/add_to_cart/" + encodeURIComponent(itemName) +
+            "?quantity=" + quantity;
+    }
+
+    // Search and category filters
+    const searchInput = document.getElementById("foodSearch");
+    const foodCards = document.querySelectorAll(".food-card");
+    const categoryButtons = document.querySelectorAll(".category");
+    const noResults = document.getElementById("noResults");
+
+    let selectedCategory = "all";
+
+    function filterFood() {
+        const searchText = searchInput.value.toLowerCase().trim();
+        let visibleCount = 0;
+
+        foodCards.forEach(function(card) {
+            const foodName = card.dataset.name.toLowerCase();
+            const foodCategory = card.dataset.category;
+
+            const matchesSearch = foodName.includes(searchText);
+            const matchesCategory =
+                selectedCategory === "all" ||
+                foodCategory === selectedCategory;
+
+            if (matchesSearch && matchesCategory) {
+                card.style.display = "";
+                visibleCount++;
+            } else {
+                card.style.display = "none";
+            }
+        });
+
+        noResults.style.display = visibleCount === 0 ? "block" : "none";
+    }
+
+    searchInput.addEventListener("input", filterFood);
+
+    categoryButtons.forEach(function(button) {
+        button.addEventListener("click", function() {
+            categoryButtons.forEach(function(categoryButton) {
+                categoryButton.classList.remove("active");
+            });
+
+            this.classList.add("active");
+            selectedCategory = this.dataset.category;
+            filterFood();
+        });
+    });
+</script>
+
+</body>
+</html>

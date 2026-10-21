@@ -1,0 +1,166 @@
+
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Smart Canteen - Cart</title>
+
+    <link rel="stylesheet"
+          href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+
+<body>
+
+    <!-- NAVBAR -->
+    <nav class="navbar">
+
+        <div class="logo">
+            🍔 Smart Canteen
+        </div>
+
+        <div class="nav-links">
+            <a href="/">Home</a>
+            <a href="/menu">Menu</a>
+            <a href="/cart">🛒 Cart</a>
+        </div>
+
+    </nav>
+
+
+    <!-- CART PAGE -->
+    <section class="new-cart-page">
+
+        <div class="cart-heading">
+
+            <div>
+                <span class="small-title">SMART CANTEEN</span>
+                <h1>🛒 Your Cart</h1>
+                <p>Review your food items before checkout.</p>
+            </div>
+
+            <a href="/menu" class="continue-btn">
+                ← Continue Shopping
+            </a>
+
+        </div>
+
+
+        {% if cart_items %}
+
+        <div class="cart-layout">
+
+            <!-- LEFT SIDE -->
+            <div class="cart-items-box">
+
+                <h2>Your Items</h2>
+
+                {% for item in cart_items %}
+
+                <div class="new-cart-item">
+
+                    <div class="cart-food-icon">
+
+                        {% if item == "Pav Bhaji" %}
+                            🍛
+                        {% elif item == "Poha" %}
+                            🍲
+                        {% elif item == "Maggi" %}
+                            🍜
+                        {% elif item == "Sandwich" %}
+                            🥪
+                        {% elif item == "Tea" %}
+                            ☕
+                        {% elif item == "Cold Coffee" %}
+                            🧋
+                        {% endif %}
+
+                    </div>
+
+                    <div class="cart-food-details">
+
+                        <h3>{{ item }}</h3>
+
+                        <p>Freshly prepared at the college canteen</p>
+
+                    </div>
+
+                    <div class="cart-food-price">
+                        ₹{{ prices[item] }}
+                    </div>
+
+                </div>
+
+                {% endfor %}
+
+            </div>
+
+
+            <!-- RIGHT SIDE -->
+            <div class="cart-summary">
+
+                <h2>Order Summary</h2>
+
+                <div class="summary-row">
+                    <span>Items</span>
+                    <span>{{ cart_items|length }}</span>
+                </div>
+
+                <div class="summary-row">
+                    <span>Subtotal</span>
+                    <span>₹{{ total }}</span>
+                </div>
+
+                <div class="summary-row">
+                    <span>Service Fee</span>
+                    <span>₹0</span>
+                </div>
+
+                <hr>
+
+                <div class="summary-total">
+                    <span>Total</span>
+                    <strong>₹{{ total }}</strong>
+                </div>
+
+                <a href="/checkout" class="new-checkout-btn">
+                    💳 Proceed to Checkout
+                </a>
+
+                <a href="/clear_cart" class="new-clear-btn">
+                    Clear Cart
+                </a>
+
+            </div>
+
+        </div>
+
+        {% else %}
+
+        <!-- EMPTY CART -->
+
+        <div class="new-empty-cart">
+
+            <div class="big-cart-icon">🛒</div>
+
+            <h2>Your cart is empty</h2>
+
+            <p>
+                Looks like you haven't added anything yet.
+            </p>
+
+            <a href="/menu" class="new-menu-btn">
+                🍽️ Explore Menu
+            </a>
+
+        </div>
+
+        {% endif %}
+
+    </section>
+
+</body>
+
+</html>

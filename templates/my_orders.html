@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Smart Canteen | My Orders</title>
+
+    <link rel="stylesheet"
+          href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+
+<body>
+
+<nav class="navbar">
+
+    <div class="logo">
+        🍔 Smart Canteen
+    </div>
+
+    <div class="nav-links">
+        <a href="/">Home</a>
+        <a href="/menu">Menu</a>
+        <a href="/cart">🛒 Cart</a>
+    </div>
+
+</nav>
+
+
+<main class="orders-page">
+
+    <div class="orders-header">
+
+        <span class="orders-label">
+            SMART CANTEEN
+        </span>
+
+        <h1>📋 My Orders</h1>
+
+        <p>
+            Track your canteen orders and pickup status.
+        </p>
+
+    </div>
+
+
+    {% if orders %}
+
+        {% for order in orders %}
+
+        <div class="order-card">
+
+            <div class="order-top">
+
+                <div>
+                    <span class="small-label">
+                        TOKEN
+                    </span>
+
+                    <h2>
+                        {{ order.token }}
+                    </h2>
+                </div>
+
+
+                <span class="order-status
+                    {% if order.status == 'Ready' %}
+                        ready
+                    {% elif order.status == 'Preparing' %}
+                        preparing
+                    {% elif order.status == 'Completed' %}
+                        completed
+                    {% else %}
+                        pending
+                    {% endif %}
+                ">
+
+                    {% if order.status == "Ready" %}
+                        🟢 Ready
+
+                    {% elif order.status == "Preparing" %}
+                        🟡 Preparing
+
+                    {% elif order.status == "Completed" %}
+                        ✅ Completed
+
+                    {% else %}
+                        🟠 Pending
+                    {% endif %}
+
+                </span>
+
+            </div>
+
+
+            <div class="order-items">
+
+                {% for item in order["items"] %}
+
+                    <span>🍴 {{ item }}</span>
+
+                {% endfor %}
+
+            </div>
+
+
+            <div class="order-info">
+
+                <div>
+                    <span>Pickup</span>
+                    <strong>
+                        🕐 {{ order.pickup }}
+                    </strong>
+                </div>
+
+                <div>
+                    <span>Total</span>
+                    <strong>
+                        ₹{{ order.total }}
+                    </strong>
+                </div>
+
+            </div>
+
+
+            {% if order.status == "Ready" %}
+
+<div class="ready-message">
+    🔔 Your order is ready!
+    Please collect it from the canteen.
+
+    <br>
+
+    <a href="/order-success" class="success-btn">
+        🎫 View Token
+    </a>
+</div>
+
+{% endif %}
+
+
+        </div>
+
+        {% endfor %}
+
+    {% else %}
+
+        <div class="empty-orders">
+
+            <div class="empty-icon">
+                🍽️
+            </div>
+
+            <h2>No Orders Yet</h2>
+
+            <p>
+                Your placed orders will appear here.
+            </p>
+
+            <a href="/menu" class="success-btn">
+                🍔 Browse Menu
+            </a>
+
+        </div>
+
+    {% endif %}
+
+</main>
+
+</body>
+</html>
+<script src="https://cdn.socket.io/4.7.5/socket.io.min.js"></script>
+
+<script>
+
+    const socket = io();
+
+    socket.on("order_status_updated", function(data) {
+
+        console.log("Live update received:", data);
+
+        if (data.status === "Ready") {
+
+            alert(
+                "🔔 Your order " +
+                data.token +
+                " is ready! Please collect it from the canteen."
+            );
+
+            location.reload();
+        }
+
+    });
+
+</script>
+
+</body>
+</html>

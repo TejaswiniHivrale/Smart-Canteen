@@ -1,0 +1,89 @@
+
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Smart Canteen - Login</title>
+
+    <link rel="stylesheet"
+          href="{{ url_for('static', filename='css/style.css') }}">
+
+</head>
+
+<body>
+
+    <nav class="navbar">
+
+        <div class="logo">
+            🍔 Smart Canteen
+        </div>
+
+        <div class="nav-links">
+            <a href="/">Home</a>
+            <a href="/menu">Menu</a>
+            <a href="/login">Login</a>
+        </div>
+
+    </nav>
+
+
+    <section class="login-page">
+
+        <div class="login-card">
+
+            <div class="login-icon">
+                🍔
+            </div>
+
+            <h1>Welcome Back!</h1>
+
+            <p>Login to your Smart Canteen account</p>
+
+
+            <form method="POST" action="/login">
+
+                <label>📧 Email</label>
+
+                <input
+                    type="email"
+                    name="email"
+                    placeholder="Enter your email"
+                    required
+                >
+
+
+                <label>🔒 Password</label>
+
+                <input
+                    type="password"
+                    name="password"
+                    placeholder="Enter your password"
+                    required
+                >
+
+
+                <button type="submit" class="login-btn">
+                    Login
+                </button>
+
+            </form>
+
+           
+            <p class="register-text">
+    Don't have an account?
+    <a href="/register">Create Account</a>
+</p>
+
+
+        </div>
+
+    </section>
+
+</body>
+
+</html>

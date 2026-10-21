@@ -1,0 +1,558 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Dashboard | Smart Canteen</title>
+
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap"
+          rel="stylesheet">
+
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            background: #f4f6fb;
+            color: #20243a;
+        }
+
+        .sidebar {
+            width: 245px;
+            height: 100vh;
+            position: fixed;
+            top: 0;
+            left: 0;
+            background: linear-gradient(180deg, #211b50, #40328b);
+            color: white;
+            padding: 28px 18px;
+        }
+
+        .brand {
+            font-size: 22px;
+            font-weight: 700;
+            margin-bottom: 8px;
+        }
+
+        .brand span {
+            color: #ffbd59;
+        }
+
+        .subtitle {
+            font-size: 12px;
+            color: #d4d0f0;
+            margin-bottom: 38px;
+        }
+
+        .nav-link {
+            display: block;
+            padding: 13px 15px;
+            margin: 10px 0;
+            border-radius: 10px;
+            color: white;
+            text-decoration: none;
+            font-size: 14px;
+        }
+
+        .nav-link.active,
+        .nav-link:hover {
+            background: rgba(255,255,255,0.16);
+        }
+
+        .logout {
+            position: absolute;
+            bottom: 28px;
+            left: 18px;
+            right: 18px;
+            background: #ff6b6b;
+            text-align: center;
+        }
+
+        .main {
+            margin-left: 245px;
+            padding: 30px;
+        }
+
+        .topbar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 15px;
+            flex-wrap: wrap;
+            margin-bottom: 28px;
+        }
+
+        .topbar h1 {
+            font-size: 27px;
+        }
+
+        .topbar p {
+            font-size: 13px;
+            color: #777b90;
+            margin-top: 5px;
+        }
+
+        .admin-badge {
+            background: white;
+            border-radius: 12px;
+            padding: 12px 17px;
+            box-shadow: 0 4px 18px #22222208;
+            font-size: 13px;
+        }
+
+        .stats {
+            display: grid;
+            grid-template-columns: repeat(5, minmax(125px, 1fr));
+            gap: 15px;
+            margin-bottom: 28px;
+        }
+
+        .stat-card {
+            background: white;
+            border-radius: 15px;
+            padding: 19px;
+            box-shadow: 0 5px 20px #24244a08;
+            border-bottom: 4px solid #6654d9;
+        }
+
+        .stat-card:nth-child(2) {
+            border-color: #ffae42;
+        }
+
+        .stat-card:nth-child(3) {
+            border-color: #4285f4;
+        }
+
+        .stat-card:nth-child(4) {
+            border-color: #20b486;
+        }
+
+        .stat-card:nth-child(5) {
+            border-color: #f06565;
+        }
+
+        .stat-card p {
+            color: #777b90;
+            font-size: 12px;
+        }
+
+        .stat-card h2 {
+            font-size: 29px;
+            margin-top: 8px;
+        }
+
+        .panel {
+            background: white;
+            padding: 23px;
+            border-radius: 16px;
+            box-shadow: 0 5px 20px #24244a08;
+        }
+
+        .panel-heading {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .panel-heading h2 {
+            font-size: 19px;
+        }
+
+        .filters {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+
+        input,
+        select {
+            padding: 11px 13px;
+            border: 1px solid #e0e3ee;
+            border-radius: 9px;
+            font-family: inherit;
+            font-size: 13px;
+            outline: none;
+            background: white;
+        }
+
+        input {
+            flex: 1;
+            min-width: 180px;
+        }
+
+        .orders {
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 17px;
+        }
+
+        .order-card {
+            border: 1px solid #e9eaf2;
+            border-radius: 14px;
+            padding: 19px;
+            background: #fff;
+        }
+
+        .order-top {
+            display: flex;
+            justify-content: space-between;
+            gap: 10px;
+            align-items: center;
+            margin-bottom: 14px;
+        }
+
+        .token {
+            color: #5545bd;
+            font-size: 18px;
+            font-weight: 700;
+        }
+
+        .status {
+            font-size: 11px;
+            font-weight: 600;
+            padding: 6px 10px;
+            border-radius: 20px;
+            background: #fff1d8;
+            color: #9a6400;
+        }
+
+        .status.preparing {
+            background: #e5efff;
+            color: #205cbd;
+        }
+
+        .status.ready {
+            background: #d9f8e9;
+            color: #137b50;
+        }
+
+        .status.completed {
+            background: #e8e8ef;
+            color: #4e5060;
+        }
+
+        .status.cancelled {
+            background: #ffe1e1;
+            color: #b42323;
+        }
+
+        .order-info {
+            color: #686d81;
+            font-size: 13px;
+            line-height: 1.9;
+            margin-bottom: 13px;
+            overflow-wrap: anywhere;
+        }
+
+        .order-info strong {
+            color: #252940;
+        }
+
+        .order-total {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-top: 1px solid #eeeef4;
+            padding-top: 13px;
+            margin-bottom: 14px;
+        }
+
+        .order-total strong {
+            font-size: 19px;
+            color: #272050;
+        }
+
+        .update-form {
+            display: flex;
+            gap: 9px;
+        }
+
+        .update-form select {
+            flex: 1;
+            min-width: 0;
+        }
+
+        .btn {
+            border: none;
+            padding: 11px 14px;
+            background: #5b4acb;
+            color: white;
+            border-radius: 9px;
+            cursor: pointer;
+            font-family: inherit;
+            font-weight: 600;
+            font-size: 12px;
+        }
+
+        .btn:hover {
+            background: #40328b;
+        }
+
+        .empty {
+            grid-column: 1 / -1;
+            padding: 40px 15px;
+            text-align: center;
+            color: #777b90;
+            border: 1px dashed #d9dbea;
+            border-radius: 12px;
+        }
+
+        .footer {
+            margin-top: 25px;
+            text-align: center;
+            color: #9295a6;
+            font-size: 11px;
+        }
+
+        @media (max-width: 1100px) {
+            .stats {
+                grid-template-columns: repeat(3, 1fr);
+            }
+
+            .orders {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        @media (max-width: 700px) {
+            .sidebar {
+                width: 100%;
+                height: auto;
+                position: relative;
+                padding: 18px;
+            }
+
+            .subtitle {
+                margin-bottom: 15px;
+            }
+
+            .nav-link {
+                display: inline-block;
+                margin: 4px;
+            }
+
+            .logout {
+                position: static;
+                display: block;
+                margin-top: 12px;
+            }
+
+            .main {
+                margin-left: 0;
+                padding: 18px;
+            }
+
+            .stats {
+                grid-template-columns: repeat(2, 1fr);
+            }
+
+            .topbar h1 {
+                font-size: 23px;
+            }
+
+            .panel {
+                padding: 15px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <aside class="sidebar">
+        <div class="brand">🍽️ Smart<span>Canteen</span></div>
+        <div class="subtitle">Management System</div>
+
+        <a href="{{ url_for('admin_dashboard') }}"
+           class="nav-link active">📊 Admin Dashboard</a>
+
+        <a href="{{ url_for('admin_logout') }}"
+           class="nav-link logout">↪ Logout</a>
+    </aside>
+
+    <main class="main">
+
+        <header class="topbar">
+            <div>
+                <h1>Admin Dashboard 👋</h1>
+                <p>Monitor canteen orders and manage their status.</p>
+            </div>
+
+            <div class="admin-badge">🛡️ Administrator Panel</div>
+        </header>
+
+        <section class="stats">
+            <div class="stat-card">
+                <p>Total Orders</p>
+                <h2>{{ total_orders }}</h2>
+            </div>
+
+            <div class="stat-card">
+                <p>Pending</p>
+                <h2>{{ pending_count }}</h2>
+            </div>
+
+            <div class="stat-card">
+                <p>Preparing</p>
+                <h2>{{ preparing_count }}</h2>
+            </div>
+
+            <div class="stat-card">
+                <p>Ready</p>
+                <h2>{{ ready_count }}</h2>
+            </div>
+
+            <div class="stat-card">
+                <p>Cancelled</p>
+                <h2>{{ cancelled_count }}</h2>
+            </div>
+        </section>
+
+        <section class="panel">
+            <div class="panel-heading">
+                <h2>📋 All Orders</h2>
+                <button class="btn" onclick="window.location.reload()">
+                    ↻ Refresh
+                </button>
+            </div>
+
+            <div class="filters">
+                <input type="text" id="searchInput"
+                       placeholder="Search token or food item...">
+
+                <select id="statusFilter">
+                    <option value="all">All Statuses</option>
+                    <option value="pending">Pending</option>
+                    <option value="preparing">Preparing</option>
+                    <option value="ready">Ready</option>
+                    <option value="completed">Completed</option>
+                    <option value="cancelled">Cancelled</option>
+                </select>
+            </div>
+
+            <div class="orders" id="ordersContainer">
+
+                {% for order in orders %}
+                <article class="order-card"
+                         data-token="{{ order.token|lower }}"
+                         data-items="{{ order.items|join(' ')|lower }}"
+                         data-status="{{ order.status|lower }}">
+
+                    <div class="order-top">
+                        <div class="token">🎟️ {{ order.token }}</div>
+
+                        <span class="status {{ order.status|lower }}">
+                            {{ order.status }}
+                        </span>
+                    </div>
+
+                    <div class="order-info">
+                        <div>
+                            <strong>Items:</strong>
+                            {{ order.items|join(', ') }}
+                        </div>
+
+                        <div>
+                            <strong>Student:</strong>
+                            {{ order.student_email|default('Guest', true) }}
+                        </div>
+
+                        <div>
+                            <strong>Pickup:</strong>
+                            {{ order.pickup|default('Collect when ready', true) }}
+                        </div>
+                    </div>
+
+                    <div class="order-total">
+                        <span>Total Amount</span>
+                        <strong>₹{{ order.total }}</strong>
+                    </div>
+
+                    <form class="update-form"
+                          method="POST"
+                          action="{{ url_for('update_order', token=order.token, status=order.status) }}">
+
+                        <select name="new_status" aria-label="Update order status">
+                            {% for status in ['Pending', 'Preparing', 'Ready', 'Completed', 'Cancelled'] %}
+                            <option value="{{ status }}"
+                                {% if order.status == status %}selected{% endif %}>
+                                {{ status }}
+                            </option>
+                            {% endfor %}
+                        </select>
+
+                        <button class="btn" type="submit">Update</button>
+                    </form>
+
+                </article>
+                {% else %}
+                <div class="empty" id="emptyMessage">
+                    <div style="font-size:35px; margin-bottom:10px;">🧾</div>
+                    <h3>No orders yet</h3>
+                    <p>New student orders will appear here.</p>
+                </div>
+                {% endfor %}
+
+                <div class="empty" id="noResults" style="display:none;">
+                    No matching orders found.
+                </div>
+
+            </div>
+        </section>
+
+        <div class="footer">
+            Smart Canteen Management System · Admin Panel
+        </div>
+
+    </main>
+
+    <script>
+        const searchInput = document.getElementById("searchInput");
+        const statusFilter = document.getElementById("statusFilter");
+        const orderCards = document.querySelectorAll(".order-card");
+        const noResults = document.getElementById("noResults");
+
+        function filterOrders() {
+            const search = searchInput.value.toLowerCase().trim();
+            const selectedStatus = statusFilter.value;
+            let visibleCount = 0;
+
+            orderCards.forEach(card => {
+                const token = card.dataset.token || "";
+                const items = card.dataset.items || "";
+                const status = card.dataset.status || "";
+
+                const matchesSearch =
+                    token.includes(search) || items.includes(search);
+
+                const matchesStatus =
+                    selectedStatus === "all" || status === selectedStatus;
+
+                const visible = matchesSearch && matchesStatus;
+
+                card.style.display = visible ? "" : "none";
+
+                if (visible) {
+                    visibleCount++;
+                }
+            });
+
+            noResults.style.display =
+                orderCards.length > 0 && visibleCount === 0 ? "block" : "none";
+        }
+
+        searchInput.addEventListener("input", filterOrders);
+        statusFilter.addEventListener("change", filterOrders);
+    </script>
+
+</body>
+</html>

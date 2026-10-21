@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Smart Canteen</title>
+
+    <link rel="stylesheet"
+          href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+
+<body>
+
+    <!-- Navigation Bar -->
+    <nav class="navbar">
+
+        <div class="logo">
+            🍔 Smart Canteen
+        </div>
+
+        <div class="nav-links">
+            <a href="/">Home</a>
+            <a href="/menu">Menu</a>
+            <a href="/login">Login</a>
+        </div>
+
+    </nav>
+
+
+    <!-- Hero Section -->
+    <section class="hero">
+
+        <div class="hero-content">
+
+            <div class="food-icon">
+                🍕 🍔 🍟
+            </div>
+
+            <h1>
+                Welcome to <span>Smart Canteen</span>
+            </h1>
+
+            <p>
+                Order your favorite food online,
+                skip the long queue and enjoy
+                a faster and smarter canteen experience.
+            </p>
+
+            <a href="/menu" class="menu-btn">
+                🍽️ Explore Menu
+            </a>
+
+
+            <!-- Features -->
+            <div class="features">
+
+                <div class="feature-card">
+                    <h3>⚡ Fast Ordering</h3>
+                    <p>Order food quickly from your phone.</p>
+                </div>
+
+                <div class="feature-card">
+                    <h3>🎫 Smart Token</h3>
+                    <p>Get your token and track your order.</p>
+                </div>
+
+                <div class="feature-card">
+                    <h3>📊 Live Queue</h3>
+                    <p>Check the current canteen queue.</p>
+                </div>
+
+            </div>
+
+        </div>
+
+    </section>
+
+</body>
+
+</html>

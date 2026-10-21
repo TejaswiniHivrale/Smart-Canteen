@@ -1,0 +1,758 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Smart Canteen | Checkout</title>
+
+    <link rel="stylesheet"
+          href="{{ url_for('static', filename='css/style.css') }}">
+
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            background: #fff6e8;
+            color: #292929;
+            font-family: Arial, sans-serif;
+        }
+
+        .navbar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 18px 5%;
+            background: linear-gradient(100deg, #ff6938, #ff9d1c);
+            color: white;
+            box-shadow: 0 4px 14px #00000012;
+        }
+
+        .logo {
+            color: white;
+            text-decoration: none;
+            font-size: 25px;
+            font-weight: 800;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 25px;
+            align-items: center;
+        }
+
+        .nav-links a {
+            color: white;
+            text-decoration: none;
+            font-weight: 700;
+        }
+
+        .container {
+            width: 92%;
+            max-width: 1200px;
+            margin: 38px auto;
+        }
+
+        .breadcrumb {
+            margin-bottom: 24px;
+            color: #887d73;
+            font-size: 14px;
+        }
+
+        .breadcrumb a {
+            color: #ee6935;
+            text-decoration: none;
+            font-weight: 700;
+        }
+
+        .heading {
+            margin-bottom: 28px;
+        }
+
+        .eyebrow {
+            color: #ee6935;
+            font-size: 12px;
+            font-weight: 800;
+            letter-spacing: 3px;
+        }
+
+        .heading h1 {
+            margin: 9px 0;
+            font-size: 40px;
+        }
+
+        .heading p {
+            margin: 0;
+            color: #82776e;
+        }
+
+        .layout {
+            display: grid;
+            grid-template-columns: minmax(0, 1.12fr) minmax(0, .88fr);
+            gap: 25px;
+            align-items: start;
+        }
+
+        .left-column {
+            display: flex;
+            flex-direction: column;
+            gap: 22px;
+            min-width: 0;
+        }
+
+        .card {
+            min-width: 0;
+            padding: 26px;
+            background: white;
+            border: 1px solid #f0e7dc;
+            border-radius: 21px;
+            box-shadow: 0 8px 28px #79552b0a;
+        }
+
+        .section-heading {
+            display: flex;
+            align-items: center;
+            gap: 13px;
+            margin-bottom: 23px;
+        }
+
+        .section-icon {
+            width: 49px;
+            height: 49px;
+            display: grid;
+            place-items: center;
+            flex-shrink: 0;
+            border-radius: 14px;
+            background: #fff0e4;
+            font-size: 23px;
+        }
+
+        .section-heading h2 {
+            margin: 0 0 6px;
+            font-size: 21px;
+        }
+
+        .section-heading p {
+            margin: 0;
+            color: #8d8279;
+            font-size: 13px;
+        }
+
+        .payment-option {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 15px;
+            margin-bottom: 13px;
+            border: 1.5px solid #eee8e2;
+            border-radius: 15px;
+            cursor: pointer;
+            transition: .2s;
+        }
+
+        .payment-option:hover {
+            border-color: #ff9460;
+            background: #fffaf6;
+        }
+
+        .payment-option:has(input:checked) {
+            border-color: #ff713c;
+            background: #fff7f0;
+        }
+
+        .payment-option input {
+            width: 17px;
+            height: 17px;
+            flex-shrink: 0;
+            accent-color: #ff713c;
+        }
+
+        .payment-icon {
+            width: 44px;
+            height: 44px;
+            display: grid;
+            place-items: center;
+            flex-shrink: 0;
+            border-radius: 12px;
+            background: #fff0e4;
+            font-size: 22px;
+        }
+
+        .payment-info {
+            min-width: 0;
+        }
+
+        .payment-info strong {
+            display: block;
+            margin-bottom: 5px;
+            font-size: 15px;
+        }
+
+        .payment-info small {
+            color: #8b8178;
+            font-size: 12px;
+        }
+
+        .popular {
+            display: inline-block;
+            margin-left: 5px;
+            padding: 4px 6px;
+            border-radius: 5px;
+            background: #e6f6e9;
+            color: #27834c;
+            font-size: 9px;
+        }
+
+        .payment-note {
+            margin-top: 18px;
+            padding: 14px;
+            border-radius: 12px;
+            background: #fff7ed;
+            color: #7e7166;
+            font-size: 12px;
+            line-height: 1.7;
+        }
+
+        /* Order summary */
+
+        .order-card {
+            position: sticky;
+            top: 20px;
+        }
+
+        .order-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 12px;
+            padding-bottom: 19px;
+            border-bottom: 1px solid #eee8e1;
+        }
+
+        .order-header h2 {
+            margin: 0 0 7px;
+            font-size: 23px;
+        }
+
+        .order-header p {
+            margin: 0;
+            color: #92877e;
+            font-size: 13px;
+        }
+
+        .cart-icon {
+            width: 48px;
+            height: 48px;
+            display: grid;
+            place-items: center;
+            flex-shrink: 0;
+            border-radius: 14px;
+            background: #fff0e4;
+            font-size: 23px;
+        }
+
+        .order-items {
+            display: flex;
+            flex-direction: column;
+            width: 100%;
+            max-height: 400px;
+            overflow-y: auto;
+            overflow-x: hidden;
+        }
+
+        .order-item {
+            display: flex;
+            flex-direction: row;
+            align-items: center;
+            justify-content: space-between;
+            gap: 12px;
+            width: 100%;
+            min-width: 0;
+            padding: 14px 0;
+            margin: 0;
+            border-bottom: 1px solid #f0ece7;
+        }
+
+        .item-left {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            min-width: 0;
+            flex: 1;
+        }
+
+        .food-image {
+            display: block;
+            width: 62px;
+            height: 62px;
+            flex-shrink: 0;
+            object-fit: cover;
+            border-radius: 14px;
+            background: #fff0e4;
+        }
+
+        .food-fallback {
+            display: none;
+            width: 62px;
+            height: 62px;
+            flex-shrink: 0;
+            place-items: center;
+            border-radius: 14px;
+            background: #fff0e4;
+            font-size: 26px;
+        }
+
+        .item-info {
+            min-width: 0;
+        }
+
+        .item-name {
+            font-size: 14px;
+            line-height: 1.4;
+            font-weight: 700;
+            overflow-wrap: anywhere;
+        }
+
+        .item-quantity {
+            margin-top: 5px;
+            color: #92877e;
+            font-size: 12px;
+            line-height: 1.5;
+        }
+
+        .item-price {
+            flex-shrink: 0;
+            white-space: nowrap;
+            font-size: 14px;
+            font-weight: 800;
+        }
+
+        .bill-details {
+            padding-top: 17px;
+        }
+
+        .bill-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 12px;
+            margin: 13px 0;
+            color: #827970;
+            font-size: 14px;
+        }
+
+        .bill-row strong {
+            color: #292929;
+            white-space: nowrap;
+        }
+
+        .free {
+            color: #218449 !important;
+        }
+
+        .order-total {
+            display: flex;
+            flex-direction: row;
+            justify-content: space-between;
+            align-items: center;
+            gap: 12px;
+            margin-top: 19px;
+            padding-top: 19px;
+            border-top: 1px solid #eae4dd;
+        }
+
+        .order-total span {
+            font-size: 15px;
+            font-weight: 800;
+        }
+
+        .order-total strong {
+            color: #f36b35;
+            font-size: 27px;
+            white-space: nowrap;
+        }
+
+        .checkout-btn {
+            display: block;
+            width: 100%;
+            margin-top: 22px;
+            padding: 17px 12px;
+            border: 0;
+            border-radius: 13px;
+            background: linear-gradient(100deg, #ff6938, #ff9d1c);
+            color: white;
+            font-size: 15px;
+            font-weight: 800;
+            cursor: pointer;
+            box-shadow: 0 7px 17px #ff792b25;
+            transition: .2s;
+        }
+
+        .checkout-btn:hover {
+            transform: translateY(-2px);
+        }
+
+        .back-link {
+            display: block;
+            margin-top: 16px;
+            text-align: center;
+            color: #e96831;
+            text-decoration: none;
+            font-size: 14px;
+            font-weight: 700;
+        }
+
+        .security-note {
+            margin: 17px 0 0;
+            text-align: center;
+            color: #978c83;
+            font-size: 11px;
+        }
+
+        .info-card {
+            padding: 21px;
+            border-radius: 16px;
+            background: #eef8f0;
+            color: #285d40;
+        }
+
+        .info-card h3 {
+            margin: 0 0 9px;
+            font-size: 16px;
+        }
+
+        .info-card p {
+            margin: 0;
+            font-size: 14px;
+            line-height: 1.7;
+        }
+
+        .empty-cart {
+            text-align: center;
+            padding: 35px 20px;
+        }
+
+        .empty-cart a {
+            color: #ed692f;
+            font-weight: 700;
+            text-decoration: none;
+        }
+
+        @media (max-width: 850px) {
+            .layout {
+                grid-template-columns: minmax(0, 1fr);
+            }
+
+            .order-card {
+                position: static;
+            }
+        }
+
+        @media (max-width: 520px) {
+            .navbar {
+                padding: 16px 4%;
+            }
+
+            .logo {
+                font-size: 19px;
+            }
+
+            .nav-links {
+                gap: 11px;
+                font-size: 12px;
+            }
+
+            .container {
+                width: 94%;
+                margin: 25px auto;
+            }
+
+            .heading h1 {
+                font-size: 33px;
+            }
+
+            .card {
+                padding: 19px 15px;
+                border-radius: 17px;
+            }
+
+            .payment-option {
+                gap: 9px;
+                padding: 12px 9px;
+            }
+
+            .payment-icon {
+                width: 38px;
+                height: 38px;
+            }
+
+            .food-image,
+            .food-fallback {
+                width: 52px;
+                height: 52px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+<nav class="navbar">
+    <a href="/" class="logo">🍔 Smart Canteen</a>
+
+    <div class="nav-links">
+        <a href="/">Home</a>
+        <a href="/menu">Menu</a>
+        <a href="/my-orders">My Orders</a>
+        <a href="/cart">🛒 Cart</a>
+    </div>
+</nav>
+
+<main class="container">
+
+    <div class="breadcrumb">
+        <a href="/menu">Menu</a> &nbsp;›&nbsp;
+        <a href="/cart">Cart</a> &nbsp;›&nbsp; Checkout
+    </div>
+
+    <div class="heading">
+        <div class="eyebrow">SMART CANTEEN</div>
+        <h1>Almost There! ✨</h1>
+        <p>Your food is just a few steps away.</p>
+    </div>
+
+    {% if cart_items %}
+
+    {% set food_images = {
+        "Pav Bhaji": "https://images.unsplash.com/photo-1753357303396-704b5abe8945?auto=format&fit=crop&w=180&q=80",
+        "Poha": "https://cdn.pixabay.com/photo/2022/05/07/16/38/poha-7180676_1280.jpg",
+        "Maggi": "https://images.unsplash.com/photo-1692273212247-f5efb3fc9b87?auto=format&fit=crop&w=180&q=80",
+        "Sandwich": "https://images.unsplash.com/photo-1528735602780-2552fd46c7af?auto=format&fit=crop&w=180&q=80",
+        "Tea": "https://images.unsplash.com/photo-1544787219-7f47ccb76574?auto=format&fit=crop&w=180&q=80",
+        "Cold Coffee": "https://images.unsplash.com/photo-1461023058943-07fcbe16d735?auto=format&fit=crop&w=180&q=80",
+        "Wada Pav": "https://images.unsplash.com/photo-1606491956689-2ea866880c84?auto=format&fit=crop&w=180&q=80",
+        "Veg Pulav": "https://images.unsplash.com/photo-1512058564366-18510be2db19?auto=format&fit=crop&w=180&q=80",
+        "Samosa": "https://images.unsplash.com/photo-1601050690597-df0568f70950?auto=format&fit=crop&w=180&q=80"
+    } %}
+
+    {% set food_emojis = {
+        "Pav Bhaji": "🍛",
+        "Poha": "🥣",
+        "Maggi": "🍜",
+        "Sandwich": "🥪",
+        "Tea": "☕",
+        "Cold Coffee": "🥤",
+        "Wada Pav": "🍔",
+        "Veg Pulav": "🍚",
+        "Samosa": "🥟"
+    } %}
+
+    <div class="layout">
+
+        <!-- PAYMENT SECTION -->
+        <div class="left-column">
+
+            <section class="card">
+
+                <div class="section-heading">
+                    <div class="section-icon">💳</div>
+                    <div>
+                        <h2>Choose Payment Method</h2>
+                        <p>Select how you would like to pay.</p>
+                    </div>
+                </div>
+
+                <form id="payment-form"
+                      action="{{ url_for('place_order') }}"
+                      method="POST">
+
+                    <label class="payment-option">
+                        <input type="radio"
+                               name="payment_method"
+                               value="UPI"
+                               checked
+                               required>
+
+                        <span class="payment-icon">📱</span>
+
+                        <span class="payment-info">
+                            <strong>
+                                UPI Payment
+                                <span class="popular">POPULAR</span>
+                            </strong>
+                            <small>Google Pay, PhonePe, Paytm, BHIM</small>
+                        </span>
+                    </label>
+
+                    <label class="payment-option">
+                        <input type="radio"
+                               name="payment_method"
+                               value="Card"
+                               required>
+
+                        <span class="payment-icon">💳</span>
+
+                        <span class="payment-info">
+                            <strong>Credit / Debit Card</strong>
+                            <small>Visa, Mastercard and RuPay</small>
+                        </span>
+                    </label>
+
+                    <label class="payment-option">
+                        <input type="radio"
+                               name="payment_method"
+                               value="Net Banking"
+                               required>
+
+                        <span class="payment-icon">🏦</span>
+
+                        <span class="payment-info">
+                            <strong>Net Banking</strong>
+                            <small>Pay through your bank</small>
+                        </span>
+                    </label>
+
+                    <div class="payment-note">
+                        🔒 Payment options are displayed for the project
+                        demonstration. Real online payment requires a
+                        connected payment gateway.
+                    </div>
+
+                </form>
+
+            </section>
+
+            <section class="info-card">
+                <h3>🛍️ Easy food pickup</h3>
+                <p>
+                    Place your order and receive a token number.
+                    Collect your food from the canteen when it is ready.
+                </p>
+            </section>
+
+            <section class="info-card">
+                <h3>✨ Skip the queue</h3>
+                <p>
+                    Order your favourite food online and make better
+                    use of your college break.
+                </p>
+            </section>
+
+        </div>
+
+        <!-- ORDER SUMMARY -->
+        <aside class="card order-card">
+
+            <div class="order-header">
+                <div>
+                    <h2>Your Order</h2>
+                    <p>{{ cart_items|length }} item(s)</p>
+                </div>
+
+                <div class="cart-icon">🛒</div>
+            </div>
+
+            {# Combine repeated foods in the displayed summary #}
+            {% set grouped_items = {} %}
+
+            {% for item in cart_items %}
+                {% if item in grouped_items %}
+                    {% set _ = grouped_items.update({
+                        item: grouped_items[item] + 1
+                    }) %}
+                {% else %}
+                    {% set _ = grouped_items.update({item: 1}) %}
+                {% endif %}
+            {% endfor %}
+
+            <div class="order-items">
+
+                {% for item, quantity in grouped_items.items() %}
+
+                <div class="order-item">
+
+                    <div class="item-left">
+
+                        <img
+                            class="food-image"
+                            src="{{ food_images.get(item, '') }}"
+                            alt="{{ item }}"
+                            loading="lazy"
+                            onerror="this.style.display='none'; this.nextElementSibling.style.display='grid';">
+
+                        <div class="food-fallback">
+                            {{ food_emojis.get(item, "🍽️") }}
+                        </div>
+
+                        <div class="item-info">
+                            <div class="item-name">{{ item }}</div>
+                            <div class="item-quantity">
+                                {{ quantity }} serving{% if quantity != 1 %}s{% endif %}
+                                · ₹{{ prices[item] }} each
+                            </div>
+                        </div>
+
+                    </div>
+
+                    <strong class="item-price">
+                        ₹{{ prices[item] * quantity }}
+                    </strong>
+
+                </div>
+
+                {% endfor %}
+
+            </div>
+
+            <div class="bill-details">
+
+                <div class="bill-row">
+                    <span>Item total</span>
+                    <strong>₹{{ total }}</strong>
+                </div>
+
+                <div class="bill-row">
+                    <span>Service fee</span>
+                    <strong class="free">Free</strong>
+                </div>
+
+                <div class="order-total">
+                    <span>Total Amount</span>
+                    <strong>₹{{ total }}</strong>
+                </div>
+
+                <button type="submit"
+                        form="payment-form"
+                        class="checkout-btn">
+                    🛍️ Place Order · ₹{{ total }}
+                </button>
+
+                <a href="/cart" class="back-link">← Back to Cart</a>
+
+                <p class="security-note">
+                    🔒 Secure order details
+                </p>
+
+            </div>
+
+        </aside>
+
+    </div>
+
+    {% else %}
+
+    <section class="card empty-cart">
+        <h2>🛒 Your cart is empty</h2>
+        <p>Add some delicious food before checking out.</p>
+        <a href="/menu">Browse Menu →</a>
+    </section>
+
+    {% endif %}
+
+</main>
+
+</body>
+</html>

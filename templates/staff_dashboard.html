@@ -1,0 +1,113 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Staff Dashboard | Smart Canteen</title>
+<style>
+*{box-sizing:border-box}
+body{margin:0;font-family:Arial;background:#f3f5fa;color:#20283a}
+header{background:#172554;color:white;padding:20px 5%;display:flex;justify-content:space-between;align-items:center}
+header h2{margin:0}
+a,button{cursor:pointer;text-decoration:none;border:0;border-radius:8px;padding:11px 15px}
+header a{background:#ef6544;color:white}
+main{max-width:1200px;margin:auto;padding:28px 20px}
+.sub{color:#718096}
+.stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:14px;margin:25px 0}
+.stat,.order{background:white;padding:20px;border-radius:14px;box-shadow:0 4px 15px #00000008}
+.stat h2{font-size:30px;margin:0 0 8px;color:#ef6544}
+.toolbar{display:flex;gap:10px;margin:20px 0;flex-wrap:wrap}
+input,select{padding:12px;border:1px solid #d7dce5;border-radius:8px;background:white}
+input{flex:1;min-width:180px}
+.orders{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:16px}
+.top{display:flex;justify-content:space-between;gap:8px;align-items:center}
+.badge{background:#fff0df;color:#b45309;padding:7px 10px;border-radius:20px;font-size:12px}
+.items{line-height:1.9}
+.total{font-size:24px;font-weight:bold;margin:15px 0}
+form{display:flex;gap:8px;margin-top:15px}
+form select{flex:1;min-width:0}
+button{background:#ef6544;color:white;font-weight:bold}
+.empty{background:white;padding:25px;border-radius:12px;text-align:center}
+</style>
+</head>
+<body>
+<header>
+<h2>🍔 Smart Canteen · Staff</h2>
+<a href="{{ url_for('staff_logout') }}">Logout</a>
+</header>
+<main>
+<h1>Staff Order Dashboard</h1>
+<p class="sub">Manage preparation and student pickups.</p>
+
+<section class="stats">
+<div class="stat"><h2>{{ orders|length }}</h2>Total Orders</div>
+<div class="stat"><h2>{{ orders|selectattr('status','equalto','Pending')|list|length }}</h2>Pending</div>
+<div class="stat"><h2>{{ orders|selectattr('status','equalto','Preparing')|list|length }}</h2>Preparing</div>
+<div class="stat"><h2>{{ orders|selectattr('status','equalto','Ready')|list|length }}</h2>Ready</div>
+</section>
+
+<div class="toolbar">
+<input id="search" placeholder="Search token or food...">
+<select id="filter">
+<option value="All">All Orders</option>
+<option>Pending</option>
+<option>Preparing</option>
+<option>Ready</option>
+<option>Completed</option>
+<option>Cancelled</option>
+</select>
+</div>
+
+{% if orders %}
+<section class="orders">
+{% for order in orders|reverse %}
+<article class="order" data-status="{{ order.status }}"
+data-search="{{ order.token }} {{ order.items|join(' ') }}">
+<div class="top">
+<h3>Token #{{ order.token }}</h3>
+<span class="badge">{{ order.status }}</span>
+</div>
+<p><b>Order items</b></p>
+<div class="items">
+{% for item in order.items %}
+🍽️ {{ item }}<br>
+{% endfor %}
+</div>
+<div class="total">₹{{ order.total }}</div>
+
+<form method="POST"
+action="{{ url_for('update_order',token=order.token,status=order.status) }}">
+<select name="new_status">
+{% for s in ['Pending','Preparing','Ready','Completed','Cancelled'] %}
+<option value="{{ s }}" {% if order.status==s %}selected{% endif %}>{{ s }}</option>
+{% endfor %}
+</select>
+<button type="submit">Update</button>
+</form>
+</article>
+{% endfor %}
+</section>
+<p id="empty" class="empty" hidden>No matching orders found.</p>
+{% else %}
+<div class="empty"><h2>📋 No orders yet</h2>New student orders will appear here.</div>
+{% endif %}
+</main>
+<script>
+const search=document.getElementById('search');
+const filter=document.getElementById('filter');
+function applyFilters(){
+let count=0;
+document.querySelectorAll('.order').forEach(card=>{
+const matchText=card.dataset.search.toLowerCase().includes(search.value.toLowerCase());
+const matchStatus=filter.value==='All'||card.dataset.status===filter.value;
+card.hidden=!(matchText&&matchStatus);
+if(!card.hidden)count++;
+});
+document.getElementById('empty').hidden=count!==0;
+}
+search.addEventListener('input',applyFilters);
+filter.addEventListener('change',applyFilters);
+</script>
+</body>
+</html>

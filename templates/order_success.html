@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Smart Canteen | Order Confirmed</title>
+
+    <link rel="stylesheet"
+          href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+
+<body>
+
+<nav class="navbar">
+
+    <div class="logo">
+        🍔 Smart Canteen
+    </div>
+
+    <div class="nav-links">
+        <a href="/">Home</a>
+        <a href="/menu">Menu</a>
+        <a href="/cart">🛒 Cart</a>
+    </div>
+
+</nav>
+
+
+<main class="success-page">
+
+    <div class="success-card">
+
+        <div class="success-icon">
+            ✓
+        </div>
+
+        <span class="success-label">
+            ORDER CONFIRMED
+        </span>
+
+        <h1>🎉 Your Order is Placed!</h1>
+
+        <p class="success-message">
+            Your order has been successfully sent to the canteen staff.
+        </p>
+
+
+        <div class="token-box">
+
+            <span>Your Token Number</span>
+
+            <strong>
+                {{ order.token }}
+            </strong>
+
+        </div>
+
+
+        <div class="success-details">
+
+            <div>
+                <span>Status</span>
+                <strong>🟠 {{ order.status }}</strong>
+            </div>
+
+            <div>
+                <span>Pickup Time</span>
+                <strong>🕐 {{ order.pickup }}</strong>
+            </div>
+
+            <div>
+                <span>Total Amount</span>
+                <strong>₹{{ order.total }}</strong>
+            </div>
+
+        </div>
+
+
+        <div class="ordered-food">
+
+            <h3>🍴 Your Items</h3>
+
+            {% for item in order["items"] %}
+
+            <div class="food-row">
+
+                <span>{{ item }}</span>
+
+                <strong>
+                    ₹{{ prices[item] if prices is defined else "" }}
+                </strong>
+
+            </div>
+
+            {% endfor %}
+
+        </div>
+
+
+        <div class="waiting-message">
+            🔔 Please wait for the canteen staff to prepare your order.
+        </div>
+
+
+        <a href="/menu" class="success-btn">
+            🍔 Order More Food
+        </a>
+
+        <a href="/" class="home-link">
+            Back to Home
+        </a>
+
+    </div>
+
+</main>
+
+</body>
+</html>
+
+<script src="https://cdn.socket.io/4.7.5/socket.io.min.js"></script>
+
+<script>
+    const socket = io();
+
+    socket.on("order_status_updated", function(data) {
+        const myToken = "{{ order.token }}";
+
+        if (data.token === myToken && data.status === "Ready") {
+            alert("🔔 Your order is ready! Please collect your food.");
+        }
+    });
+</script>
